@@ -28,7 +28,7 @@ exports.write = ctx => {
  * 포스트 목록 조회
  * GET /api/posts
  */
-exports.list = cxt => {
+exports.list = ctx => {
   ctx.body = posts;
 };
 
