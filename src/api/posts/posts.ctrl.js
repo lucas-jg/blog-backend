@@ -4,13 +4,12 @@ const posts = [
   {
     id: 1,
     title: "제목",
-    body: "내용"
+    body: "내용"                                                                                         
   }
 ];
 
 /**
  * 포스트 작성
- * POST /api/posts
  */
 
 exports.write = ctx => {
