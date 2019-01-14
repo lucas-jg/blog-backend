@@ -1,5 +1,5 @@
 const Router = require("koa-router");
-
+const postsCtrl = require("./posts.ctrl");
 const posts = new Router();
 
 const Info = ctx => {
@@ -10,11 +10,11 @@ const Info = ctx => {
   };
 };
 
-posts.get("/", Info);
-posts.post("/", Info);
-posts.get("/:id", Info);
-posts.delete("/:id", Info);
-posts.put("/:id", Info);
-posts.patch("/:id", Info);
+posts.get("/", postsCtrl.list);
+posts.post("/", postsCtrl.write);
+posts.get("/:id", postsCtrl.read);
+posts.delete("/:id", postsCtrl.remove);
+posts.put("/:id", postsCtrl.replace);
+posts.patch("/:id", postsCtrl.update);
 
 module.exports = posts;
