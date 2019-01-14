@@ -29,11 +29,20 @@ exports.write = ctx => {
  * GET /api/posts
  */
 exports.list = cxt => {
+  ctx.body = posts;
+};
+
+/**
+ * 특정 포스트 조회
+ * GET /api/posts/:id
+ */
+exports.read = ctx => {
   const { id } = ctx.params;
 
   // 주어진 id 값으로 포스트를 찾습니다.
   // 파라미터로 받아 온 값은 문자열 형식이니 파라미터를 숫자로 변환하거나,
   // 비교할 p.id 값을 문자열로 변경해야 합니다.
+  const post = posts.find(p => p.id.toString() === id);
 
   // 포스트가 없으면 오류를 반환합니다.
   if (!post) {
