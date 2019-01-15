@@ -1,6 +1,10 @@
 const Post = require("models/post");
-const { ObjectId } = require("mongoose").Types;
+const { ObjectId } = require("mongoose").Types; // ID 검증
+const Joi = require("joi"); // body 검증
 
+/**
+ * MongoDB에서 생성되는 고유 ID를 검증
+ */
 exports.checkObjectId = (ctx, next) => {
   const { id } = ctx.params;
 
@@ -14,8 +18,28 @@ exports.checkObjectId = (ctx, next) => {
 };
 /**
  * 포스트 작성
+ * POST /api/posts
+ * Joi를 사용한 body 검증
  */
 exports.write = async ctx => {
+  // 검증
+  const schema = Joi.object().keys({
+    title: Joi.string().required(),
+    body: Joi.string().required(),
+    tags: Joi.array()
+      .items(Joi.string())
+      .required()
+  });
+
+  const result = Joi.validate(ctx.request.body, schema);
+
+  if (result.error) {
+    ctx.status = 400;
+    ctx.body = result.error;
+    return;
+  }
+
+  // 검증 이후 정상 루틴
   const { title, body, tags } = ctx.request.body;
 
   // 새 POST 인스턴스를 만듭니다,.
@@ -40,7 +64,10 @@ exports.write = async ctx => {
  */
 exports.list = async ctx => {
   try {
-    const posts = await Post.find().exec();
+    const posts = await Post.find()
+      //   .sort({ _id: -1 })
+      //   .limit(15)
+      .exec();
     ctx.body = posts;
   } catch (e) {
     ctx.throw(e, 500);
