@@ -1,6 +1,7 @@
 const Post = require("models/post");
 const { ObjectId } = require("mongoose").Types; // ID 검증
 const Joi = require("joi"); // body 검증
+const HttpStatus = require("http-status-codes");
 
 /**
  * MongoDB에서 생성되는 고유 ID를 검증
@@ -10,7 +11,7 @@ exports.checkObjectId = (ctx, next) => {
 
   // 검증 실패
   if (!ObjectId.isValid(id)) {
-    ctx.status = 400;
+    ctx.status = HttpStatus.BAD_REQUEST;
     return null;
   }
 
@@ -34,7 +35,7 @@ exports.write = async ctx => {
   const result = Joi.validate(ctx.request.body, schema);
 
   if (result.error) {
-    ctx.status = 400;
+    ctx.status = HttpStatus.BAD_REQUEST;
     ctx.body = result.error;
     return;
   }
@@ -54,7 +55,7 @@ exports.write = async ctx => {
     ctx.body = post; // 저장된 결과를 반환
   } catch (e) {
     // DB 오류
-    ctx.throw(e, 500);
+    ctx.throw(e, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 };
 
@@ -63,14 +64,24 @@ exports.write = async ctx => {
  * GET /api/posts
  */
 exports.list = async ctx => {
+  // page가 주어지지 않았다면 1로 간주, query는 문자열 형태로 받아 오므로 숫자로 변환
+  const page = parseInt(ctx.query.page || 1, 10);
+  const range = 10;
+
+  if (page < 1) {
+    ctx.status = HttpStatus.NOT_FOUND;
+    return;
+  }
+
   try {
     const posts = await Post.find()
-      //   .sort({ _id: -1 })
-      //   .limit(15)
+      .sort({ _id: -1 })
+      .limit(range)
+      .skip((page - 1) * range)
       .exec();
     ctx.body = posts;
   } catch (e) {
-    ctx.throw(e, 500);
+    ctx.throw(e, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 };
 
@@ -83,12 +94,12 @@ exports.read = async ctx => {
   try {
     const post = await Post.findById(id).exec();
     if (!post) {
-      ctx.status = 404;
+      ctx.status = HttpStatus.NOT_FOUND;
       return;
     }
     ctx.body = post;
   } catch (e) {
-    ctx.throw(e, 500);
+    ctx.throw(e, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 };
 
@@ -99,9 +110,9 @@ exports.remove = async ctx => {
   const { id } = ctx.params;
   try {
     await Post.findByIdAndRemove(id).exec();
-    ctx.status = 204;
+    ctx.status = HttpStatus.NO_CONTENT;
   } catch (e) {
-    ctx.throw(e, 500);
+    ctx.throw(e, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 };
 
@@ -119,10 +130,10 @@ exports.update = async ctx => {
     }).exec();
 
     if (!post) {
-      ctx.status = 404;
+      ctx.status = HttpStatus.NOT_FOUND;
       return;
     }
   } catch (e) {
-    ctx.throw(e, 500);
+    ctx.throw(e, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 };
