@@ -57,6 +57,8 @@ exports.write = async ctx => {
     // DB 오류
     ctx.throw(e, HttpStatus.INTERNAL_SERVER_ERROR);
   }
+
+  console.log(post);
 };
 
 /**
