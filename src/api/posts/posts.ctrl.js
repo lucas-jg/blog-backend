@@ -43,7 +43,7 @@ exports.write = async ctx => {
   // 검증 이후 정상 루틴
   const { title, body, tags } = ctx.request.body;
 
-  // 새 POST 인스턴스를 만듭니다,.
+  // 새 POST 인스턴스를 만듭니다.
   const post = new Post({
     title,
     body,
