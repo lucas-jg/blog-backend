@@ -69,7 +69,7 @@ exports.list = async ctx => {
 	// page가 주어지지 않았다면 1로 간주, query는 문자열 형태로 받아 오므로 숫자로 변환
 	const page = parseInt(ctx.query.page || 1, 10);
 	const range = 10;
-	const limitBodyLength = 10000;
+	const limitBodyLength = 200;
 	const { tag } = ctx.query;
 
 	const query = tag
@@ -95,6 +95,8 @@ exports.list = async ctx => {
 			.lean()
 			.exec();
 
+		const postCount = await Post.count(query).exec();
+
 		const limitBody = post => ({
 			...post,
 			body:
@@ -103,11 +105,7 @@ exports.list = async ctx => {
 					: `${post.body.slice(0, limitBodyLength)}...`
 		});
 		ctx.body = posts.map(limitBody);
-
-		const postCount = await Post.count().exec();
 		ctx.set("Last-Page", Math.ceil(postCount / range));
-
-		ctx.body = posts;
 	} catch (e) {
 		ctx.throw(e, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
