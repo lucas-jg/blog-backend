@@ -3,11 +3,11 @@ const postsCtrl = require("./posts.ctrl");
 const posts = new Router();
 
 const Info = ctx => {
-	ctx.body = {
-		method: ctx.method,
-		path: ctx.path,
-		params: ctx.params
-	};
+    ctx.body = {
+        method: ctx.method,
+        path: ctx.path,
+        params: ctx.params
+    };
 };
 
 posts.get("/", postsCtrl.list);
