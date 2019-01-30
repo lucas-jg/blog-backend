@@ -66,6 +66,7 @@ exports.write = async ctx => {
  * GET /api/posts
  */
 exports.list = async ctx => {
+	console.log("GET /api/posts");
 	// page가 주어지지 않았다면 1로 간주, query는 문자열 형태로 받아 오므로 숫자로 변환
 	const page = parseInt(ctx.query.page || 1, 10);
 	const range = 10;
@@ -117,6 +118,7 @@ exports.list = async ctx => {
  */
 exports.read = async ctx => {
 	const { id } = ctx.params;
+	console.log(" GET /api/posts/:id");
 	try {
 		const post = await Post.findById(id).exec();
 		if (!post) {
@@ -134,6 +136,7 @@ exports.read = async ctx => {
  */
 exports.remove = async ctx => {
 	const { id } = ctx.params;
+	console.log("DELETE /api/posts/:id");
 	try {
 		await Post.findByIdAndRemove(id).exec();
 		ctx.status = HttpStatus.NO_CONTENT;
